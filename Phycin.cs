@@ -30,12 +30,20 @@ public class Phycin : MonoBehaviour {
     }
     private void HandleMessage(string msg) {
         Debug.Log("Server: " + msg);
+        /*
         string[] accel_data = msg.Split(';')[0].Split('>');
         float xMov = float.Parse(accel_data[1]);
         float yMov = float.Parse(accel_data[2]);
         float zMov = float.Parse(accel_data[3]);
         Vector3 newPos = new Vector3(xMov, yMov, zMov);
         camera.GetComponent<Transform>().position = newPos;
+        */
+        string[] gyro_data = msg.Split(';')[0].Split('>');
+        float xRot = float.Parse(gyro_data[1]);
+        float yRot = float.Parse(gyro_data[2]);
+        float zRot = float.Parse(gyro_data[3]);
+        Quaternion newRot = new Quaternion(xRot, -yRot, zRot, 1);
+        camera.GetComponent<Transform>().rotation = newRot;
     }
     public async void ConnectToServer() {
         await client.Connect();
