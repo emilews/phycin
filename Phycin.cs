@@ -1,34 +1,23 @@
 ﻿using UnityEngine;
-/// <summary>
-/// Forefront class for the server communication.
-/// </summary>
+
 public class Phycin : MonoBehaviour {
-    // Server IP address
     [SerializeField]
     private string hostIP;
-    // Server port
     [SerializeField]
     private int port = 8000;
-    // Flag to use localhost
     [SerializeField]
     private bool useLocalhost = false;
-    // Address used in code
+    [SerializeField]
+    private Camera camera;
     private string host => useLocalhost ? "localhost" : hostIP;
-    // Final server address
     private string server;
-    // WebSocket Client
     private WSClient client;
-    /// <summary>
-    /// Unity method called on initialization
-    /// </summary>
+   
     private void Awake() {
         server = "ws://" + host + ":" + port;
         client = new WSClient(server);
         ConnectToServer();
     }
-    /// <summary>
-    /// Unity method called every frame
-    /// </summary>
     private void Update() {
         // Check if server send new messages
         var cqueue = client.receiveQueue;
@@ -39,23 +28,18 @@ public class Phycin : MonoBehaviour {
             HandleMessage(msg);
         }
     }
-    /// <summary>
-    /// Method responsible for handling server messages
-    /// </summary>
-    /// <param name="msg">Message.</param>
     private void HandleMessage(string msg) {
         Debug.Log("Server: " + msg);
+        string[] accel_data = msg.Split(';')[0].Split('>');
+        float xMov = float.Parse(accel_data[1]);
+        float yMov = float.Parse(accel_data[2]);
+        float zMov = float.Parse(accel_data[3]);
+        Vector3 newPos = new Vector3(xMov, yMov, zMov);
+        camera.GetComponent<Transform>().position = newPos;
     }
-    /// <summary>
-    /// Call this method to connect to the server
-    /// </summary>
     public async void ConnectToServer() {
         await client.Connect();
     }
-    /// <summary>
-    /// Method which sends data through websocket
-    /// </summary>
-    /// <param name="message">Message.</param>
     public void SendRequest(string message) {
         client.Send(message);
     }
