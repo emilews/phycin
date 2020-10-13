@@ -12,7 +12,10 @@ public class Phycin : MonoBehaviour {
     private string host => useLocalhost ? "localhost" : hostIP;
     private string server;
     private WSClient client;
-   
+
+    public float smoothTime = 0.3F;
+    private Vector3 velocity = Vector3.zero;
+
     private void Awake() {
         server = "ws://" + host + ":" + port;
         client = new WSClient(server);
@@ -30,20 +33,20 @@ public class Phycin : MonoBehaviour {
     }
     private void HandleMessage(string msg) {
         Debug.Log("Server: " + msg);
-        /*
+        
         string[] accel_data = msg.Split(';')[0].Split('>');
         float xMov = float.Parse(accel_data[1]);
         float yMov = float.Parse(accel_data[2]);
         float zMov = float.Parse(accel_data[3]);
-        Vector3 newPos = new Vector3(xMov, yMov, zMov);
-        camera.GetComponent<Transform>().position = newPos;
-        */
-        string[] gyro_data = msg.Split(';')[0].Split('>');
+        Vector3 newPos = new Vector3(-xMov, -yMov, -zMov);
+        camera.GetComponent<Transform>().position = Vector3.SmoothDamp(camera.GetComponent<Transform>().position, newPos, ref velocity, smoothTime);
+        
+        /*string[] gyro_data = msg.Split(';')[0].Split('>');
         float xRot = float.Parse(gyro_data[1]);
         float yRot = float.Parse(gyro_data[2]);
         float zRot = float.Parse(gyro_data[3]);
         Quaternion newRot = new Quaternion(xRot, -yRot, zRot, 1);
-        camera.GetComponent<Transform>().rotation = newRot;
+        camera.GetComponent<Transform>().rotation = newRot;*/
     }
     public async void ConnectToServer() {
         await client.Connect();
