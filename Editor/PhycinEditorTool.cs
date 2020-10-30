@@ -12,7 +12,7 @@ public class PhycinEditorTool : EditorWindow {
     private bool invertGyro;
 
     [SerializeField]
-    private Object camera;
+    private GameObject camera;
 
     [MenuItem("Phycin/Server")]
     public static void ShowWindow() {
@@ -23,7 +23,7 @@ public class PhycinEditorTool : EditorWindow {
         GUILayout.Label("Settings", EditorStyles.boldLabel);
         GUILayout.Label("Local IP", EditorStyles.label);
         useLandscape = EditorGUILayout.Toggle("Use Landscape", useLandscape);
-        camera = EditorGUILayout.ObjectField("Camera", camera, typeof(GameObject), true);
+        camera = (GameObject)EditorGUILayout.ObjectField("Camera", camera, typeof(GameObject), true);
         if (GUILayout.Button("Start")) {
             StartServer();
         } 
@@ -34,9 +34,10 @@ public class PhycinEditorTool : EditorWindow {
 
 
     private void StartServer() {
-        PhycinServer.PhycinServer.StartPhycinServer();
+        PhycinServer.PhycinServer.StartPhycinServer(camera);
     }
     private void StopServer() {
         PhycinServer.PhycinServer.StopPhycinServer();
     }
+  
 }

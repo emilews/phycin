@@ -7,7 +7,7 @@ using WebSocketSharp.Server;
 
 namespace PhycinServer {
 
-    public class Phycin : WebSocketBehavior {
+    public class Phycins : WebSocketBehavior {
         protected override void OnMessage(MessageEventArgs e) {
             string msg = e.Data;
             string[] msgs = msg.Split('>');
@@ -15,7 +15,7 @@ namespace PhycinServer {
             for(int i = 0; i < 3; i++) {
                 values[i] = float.Parse(msgs[1].Split(';')[0].Split(':')[i]);
             }
-            UnityEngine.Debug.Log(values[0]);
+            PhycinServer.UpdateCameraRotation(values);
         }
         protected override void OnOpen() {
             UnityEngine.Debug.Log("Conexión nueva.");
@@ -27,10 +27,12 @@ namespace PhycinServer {
 
         private static WebSocketServer wss = null;
         private static bool isRunning = false;
-        public static void StartPhycinServer(){
+        private static Phycin cameraFromEditor;
+        public static void StartPhycinServer(GameObject camera){
+            cameraFromEditor = camera.GetComponent<Phycin>();
             if(wss == null) {
                 wss = new WebSocketServer("ws://"+GetLocalIPAddress());
-                wss.AddWebSocketService<Phycin>("/");
+                wss.AddWebSocketService<Phycins>("/");
                 wss.Start();
                 isRunning = true;
                 UnityEngine.Debug.Log("Server started.");
@@ -49,6 +51,10 @@ namespace PhycinServer {
                 isRunning = false;
                 UnityEngine.Debug.Log("Server stopped.");
             }
+        }
+
+        public static void UpdateCameraRotation(float[] values) {
+            cameraFromEditor.setNewRot(new Quaternion(values[0], values[1], values[2], values[3]));
         }
 
         // Won't work if there's a virtual adapter installed (e.g. 'VirtualBox Host-Only Network').

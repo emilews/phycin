@@ -4,15 +4,22 @@ using System.Net.Sockets;
 using UnityEngine;
 
 public class Phycin : MonoBehaviour {
-    [SerializeField]
-    private bool useLandscape;
 
-    // Imports from WSServer
+    private Quaternion newRot;
+    private bool changed = false;
 
     private void Awake() {
     }
-    private void Update() {
+    private void FixedUpdate() {
+        if (changed) {
+            GetComponent<Transform>().rotation = newRot;
+            changed = false;
+        }
+    }
 
+    public void setNewRot(Quaternion nR) {
+        newRot = nR;
+        changed = true;
     }
 
 }
